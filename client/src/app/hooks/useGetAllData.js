@@ -6,12 +6,13 @@ const getData = async ({ queryKey }) => {
   const [_querykey, email] = queryKey;
   const response = await axiosInstance.get(`/data/${email}`);
   return response.data;
+  console.log("🚀 ~ getData ~ response:", response)
 };
 
 const useGetData = (email) => {
   return useQuery({
     queryFn: getData,
-    queryKey: ["getemail", email],
+    queryKey: ["all-data", email],
     enabled: !!email,
     onSuccess: (data) => {
       if (data) {
@@ -20,7 +21,7 @@ const useGetData = (email) => {
     },
     onError: (error) => {
       const errorMessage =
-        error.response?.data?.message || "Failed to fetch data";
+        error.message || "Failed to fetch data";
       toast.error(errorMessage);
       console.log("🚀 ~ useGetData ~ errorMessage:", errorMessage);
     },

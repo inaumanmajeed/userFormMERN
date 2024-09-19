@@ -41,20 +41,20 @@ const ShowOrUpdate = () => {
   const { data, isFetching, isLoading } = useGetData(email);
   const { mutate: dataDelete } = useDeleteData(email);
   const { mutate: dataUpdate } = useUpdateData();
-  console.log("🚀 ~ ShowOrUpdate ~ data:", data);
 
+  const user = data?.user;
   useEffect(() => {
-    if (data) {
-      setStoredData(data);
+    if (user) {
+      setStoredData(user);
       const flattenedData = {
-        ...data.basicInfo,
-        ...data.educationInfo,
+        ...user.basicInfo,
+        ...user.educationInfo,
       };
       setInitialValues(flattenedData);
       setIsEditable(false);
       // setIsLoading(false);
     }
-  }, [data]);
+  }, [user]);
 
   useEffect(() => {
     if (countdown === null) return;
@@ -110,19 +110,18 @@ const ShowOrUpdate = () => {
     };
 
     try {
-      await dataUpdate(email, body);
+      dataUpdate({ email, body });
       setIsEditable(false);
     } catch (error) {
       console.error("Error updating data:", error);
     }
-      console.log("🚀 ~ onSubmit ~ body:", body)
   };
 
   const handleDelete = async () => {
     if (!storedData) return;
 
     try {
-      await dataDelete(email);
+      dataDelete(email);
       setInitialValues({
         fullName: "",
         age: "",
