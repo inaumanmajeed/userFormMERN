@@ -6,7 +6,6 @@ const getData = async ({ queryKey }) => {
   const [_querykey, email] = queryKey;
   const response = await axiosInstance.get(`/data/${email}`);
   return response.data;
-  console.log("🚀 ~ getData ~ response:", response)
 };
 
 const useGetData = (email) => {
