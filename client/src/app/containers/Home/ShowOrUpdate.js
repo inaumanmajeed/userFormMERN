@@ -6,7 +6,9 @@ import EducationInfoCard from "app/components/home/userInputcards/Education";
 import { MainContainerWrapper, FormButtons } from "../styles";
 import ValidationSchema from "app/utils/ValidationSchema";
 import { useNavigate } from "react-router-dom";
-import { getData, updateData, deleteData } from "app/hooks/AxiosCRUD";
+import useGetData from "app/hooks/useGetAllData";
+import useDeleteData from "app/hooks/useDeleteData";
+import useUpdateData from "app/hooks/useUpdateData";
 
 const ShowOrUpdate = () => {
   const [email, setEmail] = useState("");
@@ -32,43 +34,27 @@ const ShowOrUpdate = () => {
     workTravel: "",
     livingWithFamily: "",
   });
-  const [isLoading, setIsLoading] = useState(true);
-  const [isFetching, setIsFetching] = useState(false);
+  // const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const emailInputRef = useRef(null);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setIsFetching(true);
-      setIsLoading(true);
-      try {
-        const data = await getData(email);
-        console.log("Fetched data:", data);
-        if (data) {
-          setStoredData(data);
-          const flattenedData = {
-            ...data.basicInfo,
-            ...data.educationInfo,
-          };
-          setInitialValues(flattenedData);
-          setIsEditable(false);
-        } else {
-          console.warn("No data found for email:", email);
-        }
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      } finally {
-        setIsLoading(false);
-        setIsFetching(false);
-      }
-    };
+  const { data, isFetching, isLoading } = useGetData(email);
+  const { mutate: dataDelete } = useDeleteData(email);
+  const { mutate: dataUpdate } = useUpdateData();
+  console.log("🚀 ~ ShowOrUpdate ~ data:", data);
 
-    if (email) {
-      fetchData();
-    } else {
-      setIsLoading(false);
+  useEffect(() => {
+    if (data) {
+      setStoredData(data);
+      const flattenedData = {
+        ...data.basicInfo,
+        ...data.educationInfo,
+      };
+      setInitialValues(flattenedData);
+      setIsEditable(false);
+      // setIsLoading(false);
     }
-  }, [email]);
+  }, [data]);
 
   useEffect(() => {
     if (countdown === null) return;
@@ -88,7 +74,7 @@ const ShowOrUpdate = () => {
   const handleFetch = () => {
     if (emailSearch) {
       setEmail(emailSearch);
-      setIsLoading(true);
+      // setIsLoading(true);
       setIsEditable(false);
     }
   };
@@ -124,18 +110,19 @@ const ShowOrUpdate = () => {
     };
 
     try {
-      await updateData(email, body);
+      await dataUpdate(email, body);
       setIsEditable(false);
     } catch (error) {
       console.error("Error updating data:", error);
     }
+      console.log("🚀 ~ onSubmit ~ body:", body)
   };
 
   const handleDelete = async () => {
     if (!storedData) return;
 
     try {
-      await deleteData(email);
+      await dataDelete(email);
       setInitialValues({
         fullName: "",
         age: "",
@@ -154,7 +141,7 @@ const ShowOrUpdate = () => {
         workTravel: "",
         livingWithFamily: "",
       });
-      setCountdown(5);
+      setCountdown(3);
     } catch (error) {
       console.error("Error deleting data:", error);
     }

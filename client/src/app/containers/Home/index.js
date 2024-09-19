@@ -11,6 +11,7 @@ import EducationInfoCard from "app/components/home/userInputcards/Education";
 // Import the createData function from Axios CRUD utility
 import { createData } from "app/hooks/AxiosCRUD";
 
+
 const initialValues = {
   fullName: "",
   age: "",
