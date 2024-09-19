@@ -11,16 +11,17 @@ const getData = async ({ queryKey }) => {
 const useGetData = (email) => {
   return useQuery({
     queryFn: getData,
-    queryKey: ["all-data", email],
+    queryKey: ["getemail", email],
     enabled: !!email,
     onSuccess: (data) => {
-      if (data) {
+      console.log("🚀 ~ useGetData ~ data:", data);
+      if (data?.success && data.success === true) {
         toast.success("Data fetched successfully");
       }
     },
     onError: (error) => {
       const errorMessage =
-        error.message || "Failed to fetch data";
+        error.response?.data?.message || "Failed to fetch data";
       toast.error(errorMessage);
       console.log("🚀 ~ useGetData ~ errorMessage:", errorMessage);
     },
